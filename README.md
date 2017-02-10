@@ -1,6 +1,6 @@
 # Julia-Tools
 
-A collection of tools written in Julia for my research.
+A small collection of tools for astronomers
 
 # Crossmatch.jl
 
