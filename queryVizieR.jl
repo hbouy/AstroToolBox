@@ -28,7 +28,7 @@ Only a limited handful of all the available options is currently implemented:
 # Examples:
 Query 2MASS PSC (VizieR = II/246/out) in a box of 1.0x1.5 degrees around the Pleiades, retrieve default columns.
 ```
-query_vizier("II/246/out",56.7500,24.116,1.0,1.5,"Pleiades.fits")
+query_vizier("II/246/out",56.7500,24.116,1.0,1.5,outname="Pleiades.fits")
 ```
 Query SDSS DR9 (VizieR = V/139/sdss9) in a box of 0.5x0.5 degrees around M42 (RA=83.8221, Dec=-05.3911)
 Retrieve only RAJ2000, DEJ2000, imag, e_imag
