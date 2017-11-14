@@ -14,7 +14,7 @@ See VizieR documentation for more informations (http://vizier.cfa.harvard.edu/do
 * `height::Float64`: height of the rectangular search box (in degrees)
 * `out::Array{String}` : array specifying the result columns to list in the output. Default: default VizieR columns.
 * `outname::String` : name of the output file. Default: VizieR.fits
-
+* `filter:: Dict{String,String}` : a Dictionary of filters on the catalogue columns
 # Returns
 * FITS file called `outname`
 
@@ -26,9 +26,9 @@ Only a limited handful of all the available options is currently implemented:
 - retrieve all the sources (-out.max=unlimited)
 
 # Examples:
-Query 2MASS PSC (VizieR = II/246/out) in a box of 1.0x1.5 degrees around the Pleiades, retrieve default columns.
+Query 2MASS PSC (VizieR = II/246/out) in a box of 1.0x1.5 degrees around the Pleiades, retrieve default columns, keep only results with Qflg=AAA.
 ```
-query_vizier("II/246/out",56.7500,24.116,1.0,1.5,outname="Pleiades.fits")
+query_vizier("II/246/out",56.7500,24.116,1.0,1.5,outname="Pleiades.fits",filter=Dict("Qflg"=>"AAA"))
 ```
 Query SDSS DR9 (VizieR = V/139/sdss9) in a box of 0.5x0.5 degrees around M42 (RA=83.8221, Dec=-05.3911)
 Retrieve only RAJ2000, DEJ2000, imag, e_imag
@@ -39,7 +39,7 @@ query_vizier("V/139/sdss9",83.8221,-05.3911,0.5,0.5,out=["RAJ2000","DEJ2000","im
 """
 
 function query_vizier(catalogue::String, ra::Float64, dec::Float64,width::Float64,height::Float64,
-  ;equinox::String="J2000",out::Array{String}=["*"],outname::String="VizieR.fits")
+  ;equinox::String="J2000",out::Array{String}=["*"],outname::String="VizieR.fits",filter::Dict=Dict())
 
   # Create a string holding the center coordinates
   if signbit(dec)
@@ -48,10 +48,15 @@ function query_vizier(catalogue::String, ra::Float64, dec::Float64,width::Float6
     decsign="+"
   end
   center=string(ra)*"%2C"*decsign*string(abs(dec))
-  println(center)
   # Execute the query
-  query=post("http://vizier.u-strasbg.fr/viz-bin/asu-binfits?"; data = Dict("-source" => catalogue,
+  if isempty(filter)
+      query=post("http://vizier.u-strasbg.fr/viz-bin/asu-binfits?"; data = Dict("-source" => catalogue,
         "-out.max"=>"unlimited","-out"=>join(out,","),"-c.eq"=>equinox,
         "-c"=>center,"-c.bd"=>string(width)*"x"string(width)))
+  else
+      query=post("http://vizier.u-strasbg.fr/viz-bin/asu-binfits?"; data = merge(Dict("-source" => catalogue,
+        "-out.max"=>"unlimited","-out"=>join(out,","),"-c.eq"=>equinox,
+        "-c"=>center,"-c.bd"=>string(width)*"x"string(width)),filter))
+  end
   save(query, outname)
 end
