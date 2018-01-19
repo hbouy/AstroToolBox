@@ -1,4 +1,4 @@
-# Julia-Tools
+# JuliaAstroToolBox
 
 A small collection of tools for astronomers
 
